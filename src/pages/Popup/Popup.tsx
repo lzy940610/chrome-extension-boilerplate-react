@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import './Popup.css';
 
 const Popup: React.FC = () => {
   const [realTimeExchangeRateHTML, setRealTimeExchangeRateHTML] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+
 
   const fetchData = async () => {
     try {
+      setLoading(true);
+
       const response = await fetch('https://srh.bankofchina.com/search/whpj/search_cn.jsp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -27,7 +31,9 @@ const Popup: React.FC = () => {
       const htmlString = serializer.serializeToString(fragment);
 
       setRealTimeExchangeRateHTML(htmlString);
+      setLoading(false);
     } catch (error) {
+      setLoading(false)
       console.error('Error fetching data:', error);
     }
   };
@@ -38,7 +44,11 @@ const Popup: React.FC = () => {
 
   return (
     <div className="App">
-      <button onClick={fetchData}>查询汇率</button>
+      <div style={{ paddingBottom: 16 }}>
+        <button onClick={fetchData} >实时汇率查询</button>
+        <span style={{ paddingLeft: 16 }}>{loading ? '查询中...' : '查询已完成'}</span>
+      </div>
+
       <table dangerouslySetInnerHTML={{ __html: realTimeExchangeRateHTML }} />
     </div>
   );
